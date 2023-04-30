@@ -9,6 +9,7 @@ import com.itheima.reggie.utils.ValidateCodeUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 @RestController
 @Slf4j
@@ -24,7 +26,8 @@ import java.util.Map;
 public class UserController {
     @Autowired
     UserService userService;
-
+    @Autowired
+    RedisTemplate redisTemplate;
     @PostMapping("/sendMsg")
     public R<String> sendMsg(@RequestBody User user, HttpSession session){
 
@@ -40,7 +43,10 @@ public class UserController {
             log.info(phone);
             log.info(code);
             //SMSUtils.sendMessage("菜帅","SMS_276496166",phone,code);
-            session.setAttribute(phone,code);
+            //session.setAttribute(phone,code);
+
+            redisTemplate.opsForValue().set(phone,code,5, TimeUnit.MINUTES);
+
             return R.success("短信发送成功");
         }
 
@@ -53,7 +59,11 @@ public class UserController {
         String phone=map.get("phone").toString();
         String code=map.get("code").toString();
         //从session获得验证码
-        Object codeInSession = session.getAttribute(phone);
+        //Object codeInSession = session.getAttribute(phone);
+
+        Object codeInSession = (String)redisTemplate.opsForValue().get(phone);
+
+
         //进行比对
         if(codeInSession!=null&&codeInSession.equals(code)){
 
@@ -66,6 +76,9 @@ public class UserController {
                 userService.save(user);
             }
             session.setAttribute("user",user.getId());
+
+            redisTemplate.delete(phone);
+
             return R.success(user);
         }
         return R.error("验证码错啦");
