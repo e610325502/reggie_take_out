@@ -9,24 +9,24 @@ import org.springframework.data.redis.core.ValueOperations;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.PriorityQueue;
 
-@SpringBootTest
+import static org.apache.coyote.http11.Constants.a;
+
+//@SpringBootTest
 public class test1 {
-    @Autowired
-    RedisTemplate redisTemplate;
+
     @Test
-        public void test(){
-        List<Integer> list=new ArrayList<>();
-        list.add(1);
-        list.add(2);
-        list.add(2);
-        list.add(4);
-        for(int i=0;i<list.size();i++){
-            if(list.get(i)==2){
-                list.remove(i);
-                i--;
-            }
-        }
-        System.out.println(list);
+    public void test(){
+        PriorityQueue<Integer> queue=new PriorityQueue<>((a,b)->a-b);
+        queue.offer(1);
+        queue.offer(6);
+        queue.offer(3);
+        queue.offer(5);
+        queue.offer(2);
+        System.out.println(queue);
+
+
     }
+
 }

@@ -12,7 +12,7 @@ spring:
   aop:
     proxy-target-class: true
   redis:
-    host: 192.168.70.133
+    host: 192.168.70.135
     port: 6379
     password: 123456
     database: 0
@@ -30,3 +30,4 @@ mybatis-plus:
       id-type: ASSIGN_ID
 reggie:
   abc: D:\img\
+aaaaaaaa
